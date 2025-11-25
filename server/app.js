@@ -2,11 +2,24 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
+import pizzas from './controllers/pizzas.js';
 
 // Load environment variables from .env file
 dotenv.config();
 
-// get the PORT from the environment variables, OR use 3000 as default
+// Initialize MongoDB
+mongoose.connect( process.env.MONGODB );
+
+const db = mongoose.connection;
+
+db.on("error", console.error.bind(console, "Connection Error:"));
+db.once(
+  "open",
+  console.log.bind(console, "Successfully opened connection to Mongo!")
+);
+
+// Get the PORT from the environment variables, OR use 3000 as default
 const PORT = process.env.PORT || 3000
 
 // Initialize the Express application
@@ -61,6 +74,10 @@ app.get("/weather/:city", (request, response) => {
     city
   });
 });
+
+// Tell app to use the pizzas controller for routes
+//   that start with /pizzas
+app.use("/pizzas", pizzas);
 
 // Tell the Express app to start listening
 // Let the humans know I am running and listening on 3000
